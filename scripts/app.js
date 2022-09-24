@@ -11,7 +11,10 @@ const $nextPieceBoard = $("#next-piece-board");
 
 ///////////////////////////////////////////////////////////////////////
 // Constants
-console.log($gameBoard);
+
+///////////////////////////////////////////////////////////////////////
+// Game State
+
 const gameBoard = new Board($gameBoard);
 
 const nextPieceBoard = new Board($nextPieceBoard, 4, 4);

@@ -35,4 +35,22 @@ export class Board {
       this.$parentContainer.append($row);
     }
   }
+
+  update() {
+    for (let y = 0; y < this.numRows; y++) {
+      this.board[y] = new Array(this.numCols);
+      this.boardElements[y] = new Array(this.numCols);
+      const $row = $("<div class='row'></div>");
+      for (let x = 0; x < this.numCols; x++) {
+        const $block = $("<div></div>");
+        $block.addClass("square square-empty");
+        // if (x == 0) $block.addClass("left");
+        // if (y == 0) $block.addClass("top");
+        this.boardElements[y][x] = $block;
+        $row.append($block);
+        this.board[y][x] = 0;
+      }
+      this.$parentContainer.append($row);
+    }
+  }
 }
