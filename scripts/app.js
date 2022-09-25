@@ -14,7 +14,7 @@ const $linesClearedSpan = $("#lines-cleared");
 ///////////////////////////////////////////////////////////////////////
 // Constants
 const GAME_SPEED = 1;
-const CLOCK_INTERVAL = 200;
+const CLOCK_INTERVAL = 400;
 const SHAPES = [
   new Shapes.PieceI(),
   new Shapes.PieceO(),
@@ -35,13 +35,37 @@ let currPiece, nextShape, savedShape;
 // Game State
 
 const rotateClockwise = () => {
-  for (let y = 0; currPiece.shape.length; y++) {
-    for (let x = 0; x < y; x++) {
-      [currPiece.shape[y][x], currPiece.shape[x][y]] = [
-        currPiece.shape[x][y],
-        currPiece.shape[y][x],
-      ];
+  // for (let y = 0; y < currPiece.shape.length; y++) {
+  //   for (let x = 0; x < y; x++) {
+  //     [currPiece.shape[y][x], currPiece.shape[x][y]] = [
+  //       currPiece.shape[x][y],
+  //       currPiece.shape[y][x],
+  //     ];
+  //   }
+  // }
+
+  let shapeCopy = currPiece.shape.map((row) => [...row]);
+  const n = shapeCopy.length;
+  const numLayers = Math.trunc(n / 2);
+  for (let layer = 0; layer < numLayers; layer++) {
+    let first = layer,
+      last = n - first - 1;
+    for (let val = first; val < last; val++) {
+      let offset = val - first;
+
+      let top = shapeCopy[first][val];
+      let right = shapeCopy[val][last];
+      let bottom = shapeCopy[last][last - offset];
+      let left = shapeCopy[last - offset][first];
+
+      shapeCopy[first][val] = left;
+      shapeCopy[val][last] = top;
+      shapeCopy[last][last - offset] = right;
+      shapeCopy[last - offset][first] = bottom;
     }
+  }
+  if (!hasCollision({ shape: shapeCopy, x: currPiece.x, y: currPiece.y })) {
+    currPiece.shape = shapeCopy;
   }
 };
 
