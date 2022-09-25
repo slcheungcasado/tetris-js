@@ -10,7 +10,7 @@ const $sidePanel = $("#side-panel");
 const $scorePanel = $("#score-panel");
 const $savedPieceBoard = $("#saved-piece-board");
 const $nextPieceBoard = $("#next-piece-board");
-
+const $linesClearedSpan = $("#lines-cleared");
 ///////////////////////////////////////////////////////////////////////
 // Constants
 const GAME_SPEED = 1;
@@ -34,6 +34,21 @@ let currPiece, nextShape, savedShape;
 ///////////////////////////////////////////////////////////////////////
 // Game State
 
+const rotateClockwise = () => {
+  for (let y = 0; currPiece.shape.length; y++) {
+    for (let x = 0; x < y; x++) {
+      [currPiece.shape[y][x], currPiece.shape[x][y]] = [
+        currPiece.shape[x][y],
+        currPiece.shape[y][x],
+      ];
+    }
+  }
+};
+
+const updateLinesCleared = () => {
+  $linesClearedSpan.html(`Lines Cleared </br> ${linesCleared}`);
+};
+
 const moveLeft = () => {
   currPiece.x = currPiece.x - 1;
   if (hasCollision(currPiece)) {
@@ -56,6 +71,7 @@ const moveDown = () => {
     gameBoard.addPiece(currPiece);
     getNewPiece();
     linesCleared += gameBoard.clearLines();
+    updateLinesCleared();
   }
 };
 
@@ -132,7 +148,8 @@ const processKeyControls = (e) => {
       break;
     case 38:
     case "ArrowUp":
-      console.log("Rotate Piece");
+      console.log("Rotate Piece Clockwise");
+      rotateClockwise();
       break;
     case 39:
     case "ArrowRight":
@@ -161,6 +178,7 @@ const resetVars = () => {
   isGameOver = false;
   score = 0;
   linesCleared = 0;
+  updateLinesCleared();
   getNewPiece();
   // currPiece = getRandomPiece();
   // nextShape = getRandomPiece();
