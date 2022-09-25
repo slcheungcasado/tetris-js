@@ -62,4 +62,20 @@ export class Board {
       });
     });
   }
+
+  clearLines() {
+    let linesCleared = 0;
+    this.board.forEach((row, y) => {
+      let isFull = row.every((val) => val !== 0);
+      if (isFull) {
+        for (let i = y - 1; i >= 0; i--) {
+          this.board[i + 1] = this.board[i];
+        }
+        this.board[0].fill(0); //ensure top line is empty
+        linesCleared += 1;
+      }
+    });
+
+    return linesCleared;
+  }
 }
