@@ -147,37 +147,51 @@ svg:active {
 
 .square-i {
   background-color: #67b9cc;
-  border: 2px solid #111111;
+  /* border: 2px solid #111111; */
+  border-right: 2px solid #111111;
+  border-bottom: 2px solid #111111;
 }
 
 .square-o {
   background-color: #fdd834;
-  border: 2px solid #111111;
+  /* border: 2px solid #111111; */
+  border-right: 2px solid #111111;
+  border-bottom: 2px solid #111111;
 }
 
 .square-t {
   background-color: #9534fd;
-  border: 2px solid #111111;
+  /* border: 2px solid #111111; */
+  border-right: 2px solid #111111;
+  border-bottom: 2px solid #111111;
 }
 
 .square-s {
   background-color: #4caf50;
-  border: 2px solid #111111;
+  /* border: 2px solid #111111; */
+  border-right: 2px solid #111111;
+  border-bottom: 2px solid #111111;
 }
 
 .square-z {
   background-color: #ff1100;
-  border: 2px solid #111111;
+  /* border: 2px solid #111111; */
+  border-right: 2px solid #111111;
+  border-bottom: 2px solid #111111;
 }
 
 .square-j {
   background-color: #3030fa;
-  border: 2px solid #111111;
+  /* border: 2px solid #111111; */
+  border-right: 2px solid #111111;
+  border-bottom: 2px solid #111111;
 }
 
 .square-l {
   background-color: #fb7b31;
-  border: 2px solid #111111;
+  /* border: 2px solid #111111; */
+  border-right: 2px solid #111111;
+  border-bottom: 2px solid #111111;
 }
 
 .left {
