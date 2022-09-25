@@ -128,7 +128,15 @@ svg:active {
 
 .square-empty {
   border: 2px solid #e8e8e8;
+  /* border: 1px solid transparent; */
   background-color: #9370d8;
+}
+
+.square-empty-black {
+  border: 2px solid #101010;
+  /* border: 1px solid #e8e8e8; */
+  /* background-color: #9370d8; */
+  background-color: #fdd834;
 }
 
 .square-full {
