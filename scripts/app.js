@@ -22,43 +22,43 @@ let loopID;
 let prevTime, elapsedTime;
 let isGameOver, isPaused, score, linesCleared;
 let gameBoard, nextPieceBoard, savedPieceBoard;
-let currPiece, nextPiece, heldPiece;
+let currPiece, nextPiece, savedPiece;
 let hadCollision = false;
 
 ///////////////////////////////////////////////////////////////////////
 // Game State
 
 const rotateClockwise = () => {
-  let shapeCopy = currPiece.shape.map((row) => [...row]);
-  for (let y = 0; y < currPiece.shape.length; y++) {
-    for (let x = 0; x < y; x++) {
-      [currPiece.shape[y][x], currPiece.shape[x][y]] = [
-        currPiece.shape[x][y],
-        currPiece.shape[y][x],
-      ];
-    }
-  }
-
   // let shapeCopy = currPiece.shape.map((row) => [...row]);
-  // const n = currPiece.shape.length;
-  // const numLayers = Math.trunc(n / 2);
-  // for (let layer = 0; layer < numLayers; layer++) {
-  //   let first = layer,
-  //     last = n - first - 1;
-  //   for (let val = first; val < last; val++) {
-  //     let offset = val - first;
-
-  //     let top = currPiece.shape[first][val];
-  //     let right = currPiece.shape[val][last];
-  //     let bottom = currPiece.shape[last][last - offset];
-  //     let left = currPiece.shape[last - offset][first];
-
-  //     currPiece.shape[first][val] = left;
-  //     currPiece.shape[val][last] = top;
-  //     currPiece.shape[last][last - offset] = right;
-  //     currPiece.shape[last - offset][first] = bottom;
+  // for (let y = 0; y < currPiece.shape.length; y++) {
+  //   for (let x = 0; x < y; x++) {
+  //     [currPiece.shape[y][x], currPiece.shape[x][y]] = [
+  //       currPiece.shape[x][y],
+  //       currPiece.shape[y][x],
+  //     ];
   //   }
   // }
+
+  let shapeCopy = currPiece.shape.map((row) => [...row]);
+  const n = currPiece.shape.length;
+  const numLayers = Math.trunc(n / 2);
+  for (let layer = 0; layer < numLayers; layer++) {
+    let first = layer,
+      last = n - first - 1;
+    for (let val = first; val < last; val++) {
+      let offset = val - first;
+
+      let top = currPiece.shape[first][val];
+      let right = currPiece.shape[val][last];
+      let bottom = currPiece.shape[last][last - offset];
+      let left = currPiece.shape[last - offset][first];
+
+      currPiece.shape[first][val] = left;
+      currPiece.shape[val][last] = top;
+      currPiece.shape[last][last - offset] = right;
+      currPiece.shape[last - offset][first] = bottom;
+    }
+  }
   if (hasCollision(currPiece)) {
     currPiece.shape = shapeCopy;
   }
@@ -96,9 +96,9 @@ const moveDown = () => {
 
 const draw = () => {
   if (!isPaused) {
-    gameBoard.refresh(false, currPiece);
+    gameBoard.refresh();
     nextPieceBoard.refresh();
-    gameBoard.drawPiece(currPiece, false);
+    gameBoard.drawPiece(currPiece);
     nextPieceBoard.drawPiece(nextPiece);
   }
 };
@@ -217,8 +217,7 @@ const resetVars = () => {
   updateLinesCleared();
   nextPiece = getRandomPiece();
   getNewPiece();
-  // currPiece = getRandomPiece();
-  // savedShape = null;
+  savedPiece = null;
 
   prevTime = new Date();
   elapsedTime = 0;
