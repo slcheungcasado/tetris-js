@@ -33,7 +33,8 @@ export class Board {
     }
   }
 
-  refresh() {
+  refresh(hadCollision = false) {
+    if (hadCollision) debugger;
     this.board.forEach((row, y) => {
       row.forEach((val, x) => {
         this.boardElements[y][x].setBlock(val);
@@ -41,7 +42,8 @@ export class Board {
     });
   }
 
-  drawPiece(piece) {
+  drawPiece(piece, hadCollision = false) {
+    if (hadCollision) debugger;
     if (!piece) return;
     piece.shape.forEach((row, y) => {
       row.forEach((val, x) => {
@@ -52,27 +54,43 @@ export class Board {
     });
   }
 
-  addPiece(piece) {
+  lockPiece(piece, hadCollision = false) {
+    if (hadCollision) debugger;
     if (!piece) return;
-    piece.shape.forEach((row, y) => {
-      row.forEach((val, x) => {
+    console.log("Locking piece with shape", piece.shape);
+    for (let [y, row] of piece.shape.entries()) {
+      for (let [x, val] of row.entries()) {
         if (val !== 0) {
           this.board[y + piece.y][x + piece.x] = val;
         }
-      });
-    });
+      }
+    }
+    // piece.shape.forEach((row, y) => {
+    //   row.forEach((val, x) => {
+    //     if (val !== 0) {
+    //       this.board[y + piece.y][x + piece.x] = val;
+    //     }
+    //   });
+    // });
   }
 
   clearLines() {
     let linesCleared = 0;
     this.board.forEach((row, y) => {
-      let isFull = row.every((val) => val !== 0);
+      let isFull = true;
+      isFull = row.every((val) => val !== 0);
       if (isFull) {
+        console.log(`Row ${y} is full:`, row);
         for (let i = y - 1; i >= 0; i--) {
           this.board[i + 1] = this.board[i];
         }
-        this.board[0].fill(0); //ensure top line is empty
+        // if (y > 1) {
+        //   this.board[0].fill(0); //ensure top line is empty
+        // }
+        this.board[0].fill(0);
         linesCleared += 1;
+      } else {
+        console.log(`Row ${y} has space:`, row);
       }
     });
 

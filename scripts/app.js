@@ -13,6 +13,7 @@ const $nextPieceBoard = $("#next-piece-board");
 const $linesClearedSpan = $("#lines-cleared");
 ///////////////////////////////////////////////////////////////////////
 // Constants
+
 const GAME_SPEED = 1;
 const CLOCK_INTERVAL = 400;
 const SHAPES = [
@@ -29,42 +30,44 @@ let loopID;
 let prevTime, elapsedTime;
 let isGameOver, isPaused, score, linesCleared;
 let gameBoard, nextPieceBoard, savedPieceBoard;
-let currPiece, nextShape, savedShape;
+let currPiece, nextPiece, heldPiece;
+let hadCollision = false;
 
 ///////////////////////////////////////////////////////////////////////
 // Game State
 
 const rotateClockwise = () => {
-  // for (let y = 0; y < currPiece.shape.length; y++) {
-  //   for (let x = 0; x < y; x++) {
-  //     [currPiece.shape[y][x], currPiece.shape[x][y]] = [
-  //       currPiece.shape[x][y],
-  //       currPiece.shape[y][x],
-  //     ];
-  //   }
-  // }
-
   let shapeCopy = currPiece.shape.map((row) => [...row]);
-  const n = shapeCopy.length;
-  const numLayers = Math.trunc(n / 2);
-  for (let layer = 0; layer < numLayers; layer++) {
-    let first = layer,
-      last = n - first - 1;
-    for (let val = first; val < last; val++) {
-      let offset = val - first;
-
-      let top = shapeCopy[first][val];
-      let right = shapeCopy[val][last];
-      let bottom = shapeCopy[last][last - offset];
-      let left = shapeCopy[last - offset][first];
-
-      shapeCopy[first][val] = left;
-      shapeCopy[val][last] = top;
-      shapeCopy[last][last - offset] = right;
-      shapeCopy[last - offset][first] = bottom;
+  for (let y = 0; y < currPiece.shape.length; y++) {
+    for (let x = 0; x < y; x++) {
+      [currPiece.shape[y][x], currPiece.shape[x][y]] = [
+        currPiece.shape[x][y],
+        currPiece.shape[y][x],
+      ];
     }
   }
-  if (!hasCollision({ shape: shapeCopy, x: currPiece.x, y: currPiece.y })) {
+
+  // let shapeCopy = currPiece.shape.map((row) => [...row]);
+  // const n = currPiece.shape.length;
+  // const numLayers = Math.trunc(n / 2);
+  // for (let layer = 0; layer < numLayers; layer++) {
+  //   let first = layer,
+  //     last = n - first - 1;
+  //   for (let val = first; val < last; val++) {
+  //     let offset = val - first;
+
+  //     let top = currPiece.shape[first][val];
+  //     let right = currPiece.shape[val][last];
+  //     let bottom = currPiece.shape[last][last - offset];
+  //     let left = currPiece.shape[last - offset][first];
+
+  //     currPiece.shape[first][val] = left;
+  //     currPiece.shape[val][last] = top;
+  //     currPiece.shape[last][last - offset] = right;
+  //     currPiece.shape[last - offset][first] = bottom;
+  //   }
+  // }
+  if (hasCollision(currPiece)) {
     currPiece.shape = shapeCopy;
   }
 };
@@ -92,7 +95,7 @@ const moveDown = () => {
   if (hasCollision(currPiece)) {
     currPiece.y = currPiece.y - 1;
     // gameOver();
-    gameBoard.addPiece(currPiece);
+    gameBoard.lockPiece(currPiece, hadCollision);
     getNewPiece();
     linesCleared += gameBoard.clearLines();
     updateLinesCleared();
@@ -101,8 +104,9 @@ const moveDown = () => {
 
 const draw = () => {
   if (!isPaused) {
-    gameBoard.refresh();
-    gameBoard.drawPiece(currPiece);
+    gameBoard.refresh(hadCollision);
+    nextPieceBoard.refresh();
+    gameBoard.drawPiece(currPiece, hadCollision);
   }
 };
 
@@ -134,16 +138,30 @@ const hasCollision = (piece) => {
   console.log(
     `Checking collision on coords (${currPiece.x},${currPiece.y}), for current piece: ${currPiece.name}`
   );
-  return piece.shape.some((row, y) => {
+  // if (currPiece.x < 0) return true;
+
+  const res = piece.shape.some((row, y) => {
     return row.some((val, x) => {
       if (val === 0) return false;
-      const realY = y + piece.y;
-      const realX = x + piece.x;
+      let realY = y + piece.y;
+      let realX = x + piece.x;
       if (realY >= Board.BOARD_HEIGHT) return true;
       if (realX < 0 || realX >= Board.BOARD_WIDTH) return true;
+      console.log(
+        "Last collision condition reached",
+        gameBoard.board[realY][realX],
+        gameBoard.board[realY][realX] !== 0
+      );
       return gameBoard.board[realY][realX] !== 0;
     });
   });
+  console.log(
+    `(${currPiece.x},${currPiece.y}) = ${
+      res ? "Has collision" : "No collision"
+    }`
+  );
+  hadCollision = res;
+  return res;
 };
 
 const getRandomPiece = () => {
@@ -152,8 +170,8 @@ const getRandomPiece = () => {
 
 const getNewPiece = () => {
   currPiece = getRandomPiece();
-  currPiece.x = currPiece.length === 2 ? 4 : 3;
-  currPiece.y = 0;
+  // currPiece.x = currPiece.shape.length === 2 ? 4 : 3;
+  // currPiece.y = 0;
 
   if (hasCollision(currPiece)) {
     gameOver();
@@ -167,24 +185,34 @@ const processKeyControls = (e) => {
   switch (key) {
     case 37:
     case "ArrowLeft":
+    case "a":
       console.log("Move Piece Left");
       moveLeft();
       break;
     case 38:
     case "ArrowUp":
+    case "w":
       console.log("Rotate Piece Clockwise");
       rotateClockwise();
       break;
     case 39:
     case "ArrowRight":
+    case "d":
       console.log("Move Piece Right");
       moveRight();
       break;
     case 40:
     case "ArrowDown":
+    case "s":
       console.log("Move Piece Down Manually");
       moveDown();
       // FIXME: Add more score maybe?
+      break;
+    case "p":
+      isPaused = true;
+      break;
+    case "r":
+      isPaused = false;
       break;
   }
 };
@@ -205,7 +233,7 @@ const resetVars = () => {
   updateLinesCleared();
   getNewPiece();
   // currPiece = getRandomPiece();
-  // nextShape = getRandomPiece();
+  // nextPiece = getRandomPiece();
   // savedShape = null;
 
   prevTime = new Date();
@@ -222,3 +250,6 @@ gameLoop();
 
 console.log(currPiece, "start", currPiece.x, currPiece.y, currPiece.name);
 console.log(gameBoard);
+window.gameBoard = gameBoard;
+window.$gameBoard = $gameBoard;
+window.currPiece = currPiece;

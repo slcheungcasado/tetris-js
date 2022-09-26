@@ -4,6 +4,7 @@ export class Piece {
     this.name = "empty";
     this.color = "#9370d8";
     this.shape = [[0]];
+    // this.x = this.shape.length === 2 ? 4 : 3;
     this.x = 0;
     this.y = 0;
   }
