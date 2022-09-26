@@ -16,15 +16,16 @@ const $linesClearedSpan = $("#lines-cleared");
 
 const GAME_SPEED = 1;
 const CLOCK_INTERVAL = 400;
-const SHAPES = [
-  new Shapes.PieceI(),
-  new Shapes.PieceO(),
-  new Shapes.PieceT(),
-  new Shapes.PieceS(),
-  new Shapes.PieceZ(),
-  new Shapes.PieceJ(),
-  new Shapes.PieceL(),
-];
+// const SHAPES = [
+//   new Shapes.PieceI(),
+//   new Shapes.PieceO(),
+//   new Shapes.PieceT(),
+//   new Shapes.PieceS(),
+//   new Shapes.PieceZ(),
+//   new Shapes.PieceJ(),
+//   new Shapes.PieceL(),
+// ];
+const SHAPES = ["i", "o", "t", "s", "z", "j", "l"];
 
 let loopID;
 let prevTime, elapsedTime;
@@ -95,7 +96,7 @@ const moveDown = () => {
   if (hasCollision(currPiece)) {
     currPiece.y = currPiece.y - 1;
     // gameOver();
-    gameBoard.lockPiece(currPiece, hadCollision);
+    gameBoard.lockPiece(currPiece, false);
     getNewPiece();
     linesCleared += gameBoard.clearLines();
     updateLinesCleared();
@@ -104,9 +105,10 @@ const moveDown = () => {
 
 const draw = () => {
   if (!isPaused) {
-    gameBoard.refresh(hadCollision);
+    gameBoard.refresh(false);
     nextPieceBoard.refresh();
-    gameBoard.drawPiece(currPiece, hadCollision);
+    gameBoard.drawPiece(currPiece, false);
+    nextPieceBoard.drawPiece(nextPiece);
   }
 };
 
@@ -149,6 +151,8 @@ const hasCollision = (piece) => {
       if (realX < 0 || realX >= Board.BOARD_WIDTH) return true;
       console.log(
         "Last collision condition reached",
+        `${y}, ${realY}`,
+        `${x} ${realX}`,
         gameBoard.board[realY][realX],
         gameBoard.board[realY][realX] !== 0
       );
@@ -165,13 +169,16 @@ const hasCollision = (piece) => {
 };
 
 const getRandomPiece = () => {
-  return Object.create(SHAPES[Math.trunc(Math.random() * SHAPES.length)]);
+  const pieceName = SHAPES[Math.trunc(Math.random() * SHAPES.length)];
+  return Shapes.makePiece(pieceName);
+  // return Object.create(SHAPES[Math.trunc(Math.random() * SHAPES.length)]);
 };
 
 const getNewPiece = () => {
-  currPiece = getRandomPiece();
-  // currPiece.x = currPiece.shape.length === 2 ? 4 : 3;
-  // currPiece.y = 0;
+  currPiece = nextPiece;
+  currPiece.x = currPiece.shape.length === 2 ? 4 : 3;
+  currPiece.y = 0;
+  nextPiece = getRandomPiece();
 
   if (hasCollision(currPiece)) {
     gameOver();
@@ -231,9 +238,9 @@ const resetVars = () => {
   score = 0;
   linesCleared = 0;
   updateLinesCleared();
+  nextPiece = getRandomPiece();
   getNewPiece();
   // currPiece = getRandomPiece();
-  // nextPiece = getRandomPiece();
   // savedShape = null;
 
   prevTime = new Date();

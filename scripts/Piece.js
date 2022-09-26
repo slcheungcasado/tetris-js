@@ -1,10 +1,28 @@
+export const makePiece = (pieceName) => {
+  switch (pieceName) {
+    case "i":
+      return new PieceI();
+    case "o":
+      return new PieceO();
+    case "t":
+      return new PieceT();
+    case "s":
+      return new PieceS();
+    case "z":
+      return new PieceZ();
+    case "j":
+      return new PieceJ();
+    case "l":
+      return new PieceL();
+  }
+};
+
 export class Piece {
   constructor() {
     this.val = 0;
     this.name = "empty";
     this.color = "#9370d8";
     this.shape = [[0]];
-    // this.x = this.shape.length === 2 ? 4 : 3;
     this.x = 0;
     this.y = 0;
   }
