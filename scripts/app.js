@@ -16,15 +16,6 @@ const $linesClearedSpan = $("#lines-cleared");
 
 const GAME_SPEED = 1;
 const CLOCK_INTERVAL = 400;
-// const SHAPES = [
-//   new Shapes.PieceI(),
-//   new Shapes.PieceO(),
-//   new Shapes.PieceT(),
-//   new Shapes.PieceS(),
-//   new Shapes.PieceZ(),
-//   new Shapes.PieceJ(),
-//   new Shapes.PieceL(),
-// ];
 const SHAPES = ["i", "o", "t", "s", "z", "j", "l"];
 
 let loopID;
@@ -105,7 +96,7 @@ const moveDown = () => {
 
 const draw = () => {
   if (!isPaused) {
-    gameBoard.refresh(false);
+    gameBoard.refresh(false, currPiece);
     nextPieceBoard.refresh();
     gameBoard.drawPiece(currPiece, false);
     nextPieceBoard.drawPiece(nextPiece);
@@ -124,7 +115,9 @@ const gameLoop = () => {
     }
     prevTime = currTime;
   }
-  draw();
+  if (!hadCollision) {
+    draw();
+  }
   if (!isGameOver) {
     loopID = requestAnimationFrame(gameLoop);
   }
@@ -137,11 +130,6 @@ const gameOver = () => {
 };
 
 const hasCollision = (piece) => {
-  console.log(
-    `Checking collision on coords (${currPiece.x},${currPiece.y}), for current piece: ${currPiece.name}`
-  );
-  // if (currPiece.x < 0) return true;
-
   const res = piece.shape.some((row, y) => {
     return row.some((val, x) => {
       if (val === 0) return false;
@@ -149,21 +137,11 @@ const hasCollision = (piece) => {
       let realX = x + piece.x;
       if (realY >= Board.BOARD_HEIGHT) return true;
       if (realX < 0 || realX >= Board.BOARD_WIDTH) return true;
-      console.log(
-        "Last collision condition reached",
-        `${y}, ${realY}`,
-        `${x} ${realX}`,
-        gameBoard.board[realY][realX],
-        gameBoard.board[realY][realX] !== 0
-      );
+
       return gameBoard.board[realY][realX] !== 0;
     });
   });
-  console.log(
-    `(${currPiece.x},${currPiece.y}) = ${
-      res ? "Has collision" : "No collision"
-    }`
-  );
+
   hadCollision = res;
   return res;
 };
@@ -171,7 +149,6 @@ const hasCollision = (piece) => {
 const getRandomPiece = () => {
   const pieceName = SHAPES[Math.trunc(Math.random() * SHAPES.length)];
   return Shapes.makePiece(pieceName);
-  // return Object.create(SHAPES[Math.trunc(Math.random() * SHAPES.length)]);
 };
 
 const getNewPiece = () => {
