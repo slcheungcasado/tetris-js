@@ -12,11 +12,18 @@ const $sidePanel = $("#side-panel");
 const $scorePanel = $("#score-panel");
 const $savedPieceBoard = $("#saved-piece-board");
 const $nextPieceBoard = $("#next-piece-board");
+
+const $gameLevelSpan = $("#game-level");
 const $linesClearedSpan = $("#lines-cleared");
+const $playedScoreSpan = $("#player-score");
+
 const $infoBtn = $("#info-btn");
-const $restartBtn = $("#restart-btn");
 const $infoModal = $("#info-modal-div");
 const $infoModalCloseBtn = $("#info-modal-close-button");
+
+const $gameOverHeader = $("#game-over-header");
+
+const $restartBtn = $("#restart-btn");
 
 ///////////////////////////////////////////////////////////////////////
 // Constants
@@ -26,9 +33,19 @@ const FADE_SPEED = 650;
 const CLOCK_INTERVAL = 800;
 const SHAPES = ["i", "o", "t", "s", "z", "j", "l"];
 
+const LEVEL_CONFIGS = {
+  0: { val: 0, speed: 800, linesClearedThreshold: 0, scoreMultiplier: 1 },
+  1: { val: 1, speed: 700, linesClearedThreshold: 5, scoreMultiplier: 1.5 },
+  2: { val: 2, speed: 600, linesClearedThreshold: 10, scoreMultiplier: 2 },
+  3: { val: 3, speed: 500, linesClearedThreshold: 15, scoreMultiplier: 2.5 },
+  4: { val: 4, speed: 400, linesClearedThreshold: 20, scoreMultiplier: 3 },
+  5: { val: 5, speed: 300, linesClearedThreshold: 25, scoreMultiplier: 4 },
+  6: { val: "MAX", speed: 200, linesClearedThreshold: 30, scoreMultiplier: 5 },
+};
+
 let loopID;
 let prevTime, elapsedTime;
-let isGameOver, isPaused, score, linesCleared;
+let isGameOver, isPaused, score, linesCleared, currentLevel;
 let gameBoard, nextPieceBoard, savedPieceBoard;
 let currPiece, nextPiece, savedPiece;
 let hadCollision = false;
@@ -36,9 +53,25 @@ let hadCollision = false;
 ///////////////////////////////////////////////////////////////////////
 // Game State
 
-const updateLinesCleared = () => {
-  $linesClearedSpan.html(`Lines Cleared </br> ${linesCleared}`);
+const setLevel = (linesCleared) => {
+  for (let level of Object.values(LEVEL_CONFIGS)) {
+    console.log(linesCleared, level, level.linesClearedThreshold);
+    if (linesCleared >= level.linesClearedThreshold) {
+      currentLevel = level;
+    }
+  }
+  console.log("after", currentLevel);
 };
+
+const updateGameInfo = () => {
+  $gameLevelSpan.html(`Level </br> ${currentLevel.val}`);
+  $linesClearedSpan.html(`Lines Cleared </br> ${linesCleared}`);
+  $playedScoreSpan.html(`Score </br> ${score}`);
+};
+
+// const updateLinesCleared = () => {
+//   $linesClearedSpan.html(`Lines Cleared </br> ${linesCleared}`);
+// };
 
 const hasCollision = (piece) => {
   const res = piece.shape.some((row, y) => {
@@ -104,7 +137,8 @@ const moveDown = () => {
     gameBoard.lockPiece(currPiece, false);
     getNewPiece();
     linesCleared += gameBoard.clearLines();
-    updateLinesCleared();
+    setLevel(linesCleared);
+    score += Math.trunc(linesCleared * currentLevel.scoreMultiplier);
   }
 };
 
@@ -114,6 +148,7 @@ const draw = () => {
     nextPieceBoard.refresh();
     gameBoard.drawPiece(currPiece);
     nextPieceBoard.drawPiece(nextPiece);
+    updateGameInfo();
   }
 };
 
@@ -123,7 +158,7 @@ const gameLoop = () => {
     const diff = currTime.getTime() - prevTime.getTime();
     elapsedTime += diff;
 
-    if (elapsedTime > CLOCK_INTERVAL) {
+    if (elapsedTime > currentLevel.speed) {
       moveDown();
       elapsedTime = 0;
     }
@@ -141,6 +176,7 @@ const gameOver = () => {
   console.log("Game Over");
   isGameOver = true;
   cancelAnimationFrame(loopID);
+  $gameOverHeader.show();
 };
 
 const getRandomPiece = () => {
@@ -187,6 +223,7 @@ const processKeyControls = (e) => {
     case "s":
       console.log("Move Piece Down Manually");
       moveDown();
+      score += Math.trunc(currentLevel.scoreMultiplier);
       // FIXME: Add more score maybe?
       break;
     // FIXME: using p and r is weird if it's available while playing
@@ -257,10 +294,6 @@ const showGame = () => {
   }
 };
 
-const tidyOpenModal = () => {
-  $(this).removeClass("fade-in");
-};
-
 const closeModal = () => {
   if (!isGameOver) {
     hideElement($infoModal);
@@ -290,13 +323,14 @@ const resetVars = () => {
   savedPieceBoard = new Board($savedPieceBoard, 4, 4);
 
   isGameOver = false;
+  $gameOverHeader.hide();
   score = 0;
   linesCleared = 0;
-  updateLinesCleared();
+  setLevel(linesCleared);
+  updateGameInfo();
   nextPiece = getRandomPiece();
   getNewPiece();
   savedPiece = null;
-
   prevTime = new Date();
   elapsedTime = 0;
 };

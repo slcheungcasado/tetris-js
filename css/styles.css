@@ -177,6 +177,11 @@ svg:active {
   opacity: 0;
 } */
 
+/* .modal-dialog-retro {
+  border: 2px solid #111111;
+  border-radius: 0;
+} */
+
 dl.instructions ul {
   list-style-type: none;
   /* margin-left: 0; */
@@ -282,4 +287,8 @@ dl.instructions ul {
     transform: translateY(100%);
     opacity: 0;
   }
+}
+
+#game-over-header {
+  display: none;
 }

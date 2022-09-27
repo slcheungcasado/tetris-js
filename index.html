@@ -21,11 +21,17 @@
     </div>
     <div id="game-container" class="container visually-hidden">
       <div class="row">
-        <div id="game-board" class="col-10"></div>
+        <div id="game-board" class="col-10">
+          <header id="game-over-header">Game Over!</header>
+        </div>
         <div id="side-panel" class="col-2">
           <div class="side-panel-section">
             <h6 class="side-panel-section-heading">Game Info</h6>
             <div class="row side-panel-section-info">
+              <span id="game-level"
+                >Level<br />
+                0</span
+              >
               <span id="lines-cleared"
                 >Lines Cleared<br />
                 0</span
@@ -81,65 +87,64 @@
       role="dialog"
       id="info-modal-div"
     >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content rounded-4 shadow">
-          <div class="modal-body p-5">
-            <div class="modal-heading-wrapper">
-              <h2 class="fw-bold mb-0">
-                Welcome to Tetris
-                <div class="modal-icon-wrapper">
-                  <img src="assets/tetris-big.svg" alt="tetris-icon" />
-                </div>
-              </h2>
-            </div>
-
-            <dl class="row instructions">
-              <dt class="col-sm-3">Instructions</dt>
-              <dd class="col-sm-9">
-                <ul>
-                  <li>
-                    Form as many rows as you can by moving or rotating the
-                    falling Tetris pieces. <br />
-                    <small class="text-muted"
-                      >The more lines you make at once, the more score you get.
-                    </small>
-                  </li>
-                  <li>
-                    The game ends when you can no longer place another piece.
-                  </li>
-                </ul>
-              </dd>
-
-              <dt class="col-sm-3">Movement & Rotation</dt>
-              <dd class="col-sm-9">
-                <p>
-                  Press arrow left, right, or down to move the pieces. Arrow up
-                  rotates them.
-                </p>
-                <div class="modal-icon-wrapper">
-                  <img src="assets/arrows.svg" alt="arrows-icon" />
-                  or
-                  <img src="assets/wasd.svg" alt="arrows-icon" />
-                </div>
-              </dd>
-
-              <dt class="col-sm-3">Save Piece</dt>
-              <dd class="col-sm-9">
-                <p>Press shift to save or swap the current piece in play.</p>
-                <div class="modal-icon-wrapper">
-                  <img src="assets/shift.svg" alt="arrows-icon" />
-                </div>
-              </dd>
-            </dl>
-            <button
-              type="button"
-              class="btn btn-lg btn-primary mt-5 w-100"
-              data-bs-dismiss="modal"
-              id="info-modal-close-button"
-            >
-              Got it, thanks!
-            </button>
+      <div class="modal-dialog role="document">
+      <div class="modal-content rounded-4 shadow">
+        <div class="modal-body p-5">
+          <div class="modal-heading-wrapper">
+            <h2 class="fw-bold mb-0">
+              Welcome to Tetris
+              <div class="modal-icon-wrapper">
+                <img src="assets/tetris-big.svg" alt="tetris-icon" />
+              </div>
+            </h2>
           </div>
+
+          <dl class="row instructions">
+            <dt class="col-sm-3">Instructions</dt>
+            <dd class="col-sm-9">
+              <ul>
+                <li>
+                  Form as many rows as you can by moving or rotating the falling
+                  Tetris pieces. <br />
+                  <small class="text-muted"
+                    >The more lines you make at once, the more score you get.
+                  </small>
+                </li>
+                <li>
+                  The game ends when you can no longer place another piece.
+                </li>
+              </ul>
+            </dd>
+
+            <dt class="col-sm-3">Movement & Rotation</dt>
+            <dd class="col-sm-9">
+              <p>
+                Press arrow left, right, or down to move the pieces. Arrow up
+                rotates them.
+              </p>
+              <div class="modal-icon-wrapper">
+                <img src="assets/arrows.svg" alt="arrows-icon" />
+                or
+                <img src="assets/wasd.svg" alt="arrows-icon" />
+              </div>
+            </dd>
+
+            <dt class="col-sm-3">Save Piece</dt>
+            <dd class="col-sm-9">
+              <p>Press shift to save or swap the current piece in play.</p>
+              <div class="modal-icon-wrapper">
+                <img src="assets/shift.svg" alt="arrows-icon" />
+              </div>
+            </dd>
+          </dl>
+          <button
+            type="button"
+            class="btn btn-lg btn-primary mt-5 w-100"
+            data-bs-dismiss="modal"
+            id="info-modal-close-button"
+          >
+            Got it, thanks!
+          </button>
         </div>
       </div>
     </div>
