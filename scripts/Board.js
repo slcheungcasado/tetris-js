@@ -55,6 +55,7 @@ export class Board {
   }
 
   lockPiece(piece) {
+    console.log("Locking Piece");
     if (!piece) return;
 
     piece.shape.forEach((row, y) => {

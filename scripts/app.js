@@ -1,5 +1,8 @@
 import { Board } from "./Board.js";
 import * as Shapes from "./Piece.js";
+// import * as lodash from "../js/lodash.min.js";
+// import _ from "../js/lodash.min.js";
+// const lodash = require("../lodash.min.js");
 
 ///////////////////////////////////////////////////////////////////////
 // DOM Elements
@@ -48,19 +51,21 @@ let prevTime, elapsedTime;
 let isGameOver, isPaused, score, linesCleared, currentLevel;
 let gameBoard, nextPieceBoard, savedPieceBoard;
 let currPiece, nextPiece, savedPiece;
-let hadCollision = false;
-
+let hadCollision, hasSwapped;
+let currPieceCoords, isLocking;
 ///////////////////////////////////////////////////////////////////////
 // Game State
 
+const deepCloneObj = (obj) => {
+  return JSON.parse(JSON.stringify(obj));
+};
+
 const setLevel = (linesCleared) => {
   for (let level of Object.values(LEVEL_CONFIGS)) {
-    console.log(linesCleared, level, level.linesClearedThreshold);
     if (linesCleared >= level.linesClearedThreshold) {
       currentLevel = level;
     }
   }
-  console.log("after", currentLevel);
 };
 
 const updateGameInfo = () => {
@@ -68,10 +73,6 @@ const updateGameInfo = () => {
   $linesClearedSpan.html(`Lines Cleared </br> ${linesCleared}`);
   $playedScoreSpan.html(`Score </br> ${score}`);
 };
-
-// const updateLinesCleared = () => {
-//   $linesClearedSpan.html(`Lines Cleared </br> ${linesCleared}`);
-// };
 
 const hasCollision = (piece) => {
   const res = piece.shape.some((row, y) => {
@@ -131,23 +132,29 @@ const moveRight = () => {
 };
 
 const moveDown = () => {
+  console.log(`(${currPiece.x},${currPiece.y})`);
   currPiece.y = currPiece.y + 1;
   if (hasCollision(currPiece)) {
+    isLocking = true;
     currPiece.y = currPiece.y - 1;
-    gameBoard.lockPiece(currPiece, false);
-    getNewPiece();
+    gameBoard.lockPiece(currPiece);
+    getNewCurrentPiece();
     linesCleared += gameBoard.clearLines();
     setLevel(linesCleared);
     score += Math.trunc(linesCleared * currentLevel.scoreMultiplier);
+    hasSwapped = false;
   }
+  isLocking = false;
 };
 
 const draw = () => {
   if (!isPaused) {
     gameBoard.refresh();
     nextPieceBoard.refresh();
+    savedPieceBoard.refresh();
     gameBoard.drawPiece(currPiece);
     nextPieceBoard.drawPiece(nextPiece);
+    savedPieceBoard.drawPiece(savedPiece);
     updateGameInfo();
   }
 };
@@ -166,6 +173,8 @@ const gameLoop = () => {
   }
   if (!hadCollision) {
     draw();
+  } else {
+    console.log("This happens");
   }
   if (!isGameOver) {
     loopID = requestAnimationFrame(gameLoop);
@@ -185,7 +194,7 @@ const getRandomPiece = () => {
   return Shapes.makePiece(pieceName);
 };
 
-const getNewPiece = () => {
+const getNewCurrentPiece = () => {
   currPiece = nextPiece;
   currPiece.x = currPiece.shape.length === 2 ? 4 : 3;
   currPiece.y = 0;
@@ -195,6 +204,40 @@ const getNewPiece = () => {
     gameOver();
   } else {
     console.log("No collision on getNewPiece()");
+  }
+};
+
+const saveOrSwapPiece = () => {
+  if (savedPiece === null) {
+    currPiece.x = 0;
+    currPiece.y = 0;
+    savedPiece = structuredClone(currPiece);
+    currPiece = nextPiece;
+    currPiece.x = currPiece.shape.length === 2 ? 4 : 3;
+    currPiece.y = 0;
+
+    nextPiece = getRandomPiece();
+    hasSwapped = true;
+  } else {
+    currPieceCoords = structuredClone({ x: currPiece.x, y: currPiece.y });
+    const currPieceClone = structuredClone(currPiece);
+
+    currPiece = savedPiece;
+    currPiece.x = currPieceCoords.x + currPiece.shape.length === 2 ? 4 : 3;
+    currPiece.y = currPieceCoords.y;
+
+    if (hasCollision(currPiece)) {
+      console.log("Can't swap due to collision");
+      currPiece = currPieceClone;
+      // currPiece.x = currPieceCoords.x;
+      currPiece.x = currPieceCoords.x;
+      currPiece.y = currPieceCoords.y;
+    } else {
+      currPieceClone.x = 0;
+      currPieceClone.y = 0;
+      savedPiece = currPieceClone;
+      hasSwapped = true;
+    }
   }
 };
 
@@ -225,7 +268,6 @@ const processKeyControls = (e) => {
       console.log("Move Piece Down Manually");
       moveDown();
       score += Math.trunc(currentLevel.scoreMultiplier);
-      // FIXME: Add more score maybe?
       break;
     // FIXME: using p and r is weird if it's available while playing
     // case "p":
@@ -236,6 +278,11 @@ const processKeyControls = (e) => {
     //   // isPaused = false; //resume game
     //   closeModal();
     //   break;
+    case "Shift":
+      console.log("Saving Current Piece");
+      if (!hasSwapped && !isLocking) {
+        saveOrSwapPiece();
+      }
   }
 };
 
@@ -327,6 +374,9 @@ const resetVars = () => {
   savedPieceBoard = new Board($savedPieceBoard, 4, 4);
 
   isGameOver = false;
+  hadCollision = false;
+  hasSwapped = false;
+  isLocking = false;
 
   // $gameOverHeader = $("<header id='game-over-header'>Game Over!</header>");
   // $gameBoard.prepend($gameOverHeader);
@@ -339,7 +389,8 @@ const resetVars = () => {
   updateGameInfo();
 
   nextPiece = getRandomPiece();
-  getNewPiece();
+  getNewCurrentPiece();
+  currPieceCoords = structuredClone({ x: currPiece.x, y: currPiece.y });
   savedPiece = null;
 
   prevTime = new Date();
