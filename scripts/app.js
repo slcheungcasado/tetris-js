@@ -176,7 +176,8 @@ const gameOver = () => {
   console.log("Game Over");
   isGameOver = true;
   cancelAnimationFrame(loopID);
-  $gameOverHeader.show();
+  // $gameOverHeader.toggleClass("visually-hidden");
+  $gameOverHeader.removeClass("visually-hidden");
 };
 
 const getRandomPiece = () => {
@@ -250,12 +251,6 @@ const pauseGame = () => {
   }
 };
 
-const restartGameLoop = () => {};
-
-const fadeGameIn = () => {
-  $gameContainer.fadeIn(FADE_SPEED, restartGameLoop);
-};
-
 const hideElement = ($el) => {
   $el.toggleClass("visually-hidden");
   $el.removeClass("fade-in");
@@ -310,10 +305,19 @@ const openModal = () => {
   }
 };
 
+const resetGame = () => {
+  if (loopID) {
+    cancelAnimationFrame(loopID);
+  }
+  resetVars();
+  gameLoop();
+};
+
 const bindEvents = () => {
   $doc.on("keydown", processKeyControls);
   $infoBtn.on("click", pauseGame);
   $infoModalCloseBtn.on("click", closeModal);
+  $restartBtn.on("click", resetGame);
 };
 
 const resetVars = () => {
@@ -323,14 +327,21 @@ const resetVars = () => {
   savedPieceBoard = new Board($savedPieceBoard, 4, 4);
 
   isGameOver = false;
-  $gameOverHeader.hide();
+
+  // $gameOverHeader = $("<header id='game-over-header'>Game Over!</header>");
+  // $gameBoard.prepend($gameOverHeader);
+  // $gameOverHeader.hide();
+  $gameOverHeader.addClass("visually-hidden");
+
   score = 0;
   linesCleared = 0;
   setLevel(linesCleared);
   updateGameInfo();
+
   nextPiece = getRandomPiece();
   getNewPiece();
   savedPiece = null;
+
   prevTime = new Date();
   elapsedTime = 0;
 };

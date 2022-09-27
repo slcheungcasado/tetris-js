@@ -19,6 +19,7 @@ export class Board {
   }
 
   init() {
+    this.$parentContainer.find("> div").remove();
     for (let y = 0; y < this.numRows; y++) {
       this.board[y] = new Array(this.numCols);
       this.boardElements[y] = new Array(this.numCols);
