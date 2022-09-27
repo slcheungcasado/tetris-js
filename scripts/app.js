@@ -221,17 +221,16 @@ const saveOrSwapPiece = () => {
   } else {
     currPieceCoords = structuredClone({ x: currPiece.x, y: currPiece.y });
     const currPieceClone = structuredClone(currPiece);
+    const savedPieceClone = structuredClone(savedPiece);
 
     currPiece = savedPiece;
-    currPiece.x = currPieceCoords.x + currPiece.shape.length === 2 ? 4 : 3;
+    currPiece.x = currPieceCoords.x;
     currPiece.y = currPieceCoords.y;
 
     if (hasCollision(currPiece)) {
       console.log("Can't swap due to collision");
       currPiece = currPieceClone;
-      // currPiece.x = currPieceCoords.x;
-      currPiece.x = currPieceCoords.x;
-      currPiece.y = currPieceCoords.y;
+      savedPiece = savedPieceClone;
     } else {
       currPieceClone.x = 0;
       currPieceClone.y = 0;
