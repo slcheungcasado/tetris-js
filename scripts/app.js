@@ -6,16 +6,24 @@ import * as Shapes from "./Piece.js";
 const $doc = $(document);
 const $gameContainer = $("#game-container");
 const $gameBoard = $("#game-board");
+const $gameHeader = $("#heading-wrapper");
+const $gameFooter = $("#game-footer");
 const $sidePanel = $("#side-panel");
 const $scorePanel = $("#score-panel");
 const $savedPieceBoard = $("#saved-piece-board");
 const $nextPieceBoard = $("#next-piece-board");
 const $linesClearedSpan = $("#lines-cleared");
+const $infoBtn = $("#info-btn");
+const $restartBtn = $("#restart-btn");
+const $infoModal = $("#info-modal-div");
+const $infoModalCloseBtn = $("#info-modal-close-button");
+
 ///////////////////////////////////////////////////////////////////////
 // Constants
 
 const GAME_SPEED = 1;
-const CLOCK_INTERVAL = 400;
+const FADE_SPEED = 650;
+const CLOCK_INTERVAL = 800;
 const SHAPES = ["i", "o", "t", "s", "z", "j", "l"];
 
 let loopID;
@@ -28,17 +36,28 @@ let hadCollision = false;
 ///////////////////////////////////////////////////////////////////////
 // Game State
 
-const rotateClockwise = () => {
-  // let shapeCopy = currPiece.shape.map((row) => [...row]);
-  // for (let y = 0; y < currPiece.shape.length; y++) {
-  //   for (let x = 0; x < y; x++) {
-  //     [currPiece.shape[y][x], currPiece.shape[x][y]] = [
-  //       currPiece.shape[x][y],
-  //       currPiece.shape[y][x],
-  //     ];
-  //   }
-  // }
+const updateLinesCleared = () => {
+  $linesClearedSpan.html(`Lines Cleared </br> ${linesCleared}`);
+};
 
+const hasCollision = (piece) => {
+  const res = piece.shape.some((row, y) => {
+    return row.some((val, x) => {
+      if (val === 0) return false;
+      let realY = y + piece.y;
+      let realX = x + piece.x;
+      if (realY >= Board.BOARD_HEIGHT) return true;
+      if (realX < 0 || realX >= Board.BOARD_WIDTH) return true;
+
+      return gameBoard.board[realY][realX] !== 0;
+    });
+  });
+
+  hadCollision = res;
+  return res;
+};
+
+const rotateClockwise = () => {
   let shapeCopy = currPiece.shape.map((row) => [...row]);
   const n = currPiece.shape.length;
   const numLayers = Math.trunc(n / 2);
@@ -64,10 +83,6 @@ const rotateClockwise = () => {
   }
 };
 
-const updateLinesCleared = () => {
-  $linesClearedSpan.html(`Lines Cleared </br> ${linesCleared}`);
-};
-
 const moveLeft = () => {
   currPiece.x = currPiece.x - 1;
   if (hasCollision(currPiece)) {
@@ -86,7 +101,6 @@ const moveDown = () => {
   currPiece.y = currPiece.y + 1;
   if (hasCollision(currPiece)) {
     currPiece.y = currPiece.y - 1;
-    // gameOver();
     gameBoard.lockPiece(currPiece, false);
     getNewPiece();
     linesCleared += gameBoard.clearLines();
@@ -127,23 +141,6 @@ const gameOver = () => {
   console.log("Game Over");
   isGameOver = true;
   cancelAnimationFrame(loopID);
-};
-
-const hasCollision = (piece) => {
-  const res = piece.shape.some((row, y) => {
-    return row.some((val, x) => {
-      if (val === 0) return false;
-      let realY = y + piece.y;
-      let realX = x + piece.x;
-      if (realY >= Board.BOARD_HEIGHT) return true;
-      if (realX < 0 || realX >= Board.BOARD_WIDTH) return true;
-
-      return gameBoard.board[realY][realX] !== 0;
-    });
-  });
-
-  hadCollision = res;
-  return res;
 };
 
 const getRandomPiece = () => {
@@ -192,17 +189,98 @@ const processKeyControls = (e) => {
       moveDown();
       // FIXME: Add more score maybe?
       break;
-    case "p":
-      isPaused = true;
-      break;
-    case "r":
-      isPaused = false;
-      break;
+    // FIXME: using p and r is weird if it's available while playing
+    // case "p":
+    //   // isPaused = true; //pause game
+    //   pauseGame();
+    //   break;
+    // case "r":
+    //   // isPaused = false; //resume game
+    //   closeModal();
+    //   break;
+  }
+};
+
+const pauseGame = () => {
+  if (!isPaused && !isGameOver) {
+    isPaused = true;
+    console.log("Game is paused");
+    console.log("Displaying Modal");
+    hideElement($gameFooter);
+    hideElement($gameHeader);
+    hideElement($gameContainer);
+    showElement($infoModal);
+  }
+};
+
+const restartGameLoop = () => {};
+
+const fadeGameIn = () => {
+  $gameContainer.fadeIn(FADE_SPEED, restartGameLoop);
+};
+
+const hideElement = ($el) => {
+  $el.toggleClass("visually-hidden");
+  $el.removeClass("fade-in");
+  $el.removeClass("slide-in");
+  $el.addClass("fade-out");
+  $el.addClass("slide-out");
+};
+
+const showElement = ($el) => {
+  $el.toggleClass("visually-hidden");
+  $el.removeClass("fade-out");
+  $el.removeClass("slide-out");
+  $el.show();
+  $el.addClass("fade-in");
+  $el.addClass("slide-in");
+};
+
+const resumeGame = () => {
+  if (!isGameOver) {
+    isPaused = false;
+    console.log("Game resumes");
+    if (loopID) {
+      cancelAnimationFrame(loopID);
+    }
+    gameLoop();
+  }
+};
+
+const showGame = () => {
+  if (!isGameOver) {
+    console.log("Showing Game Board...");
+    showElement($gameContainer);
+    showElement($gameHeader);
+    showElement($gameFooter);
+    setTimeout(resumeGame, FADE_SPEED);
+  }
+};
+
+const tidyOpenModal = () => {
+  $(this).removeClass("fade-in");
+};
+
+const closeModal = () => {
+  if (!isGameOver) {
+    hideElement($infoModal);
+    setTimeout(showGame, FADE_SPEED);
+  }
+};
+
+const openModal = () => {
+  if (!isGameOver) {
+    $infoModal.toggleClass("visually-hidden");
+    $infoModal.show();
+    $infoModal.addClass("fade-in");
+    $infoModal.addClass("slide-in");
   }
 };
 
 const bindEvents = () => {
   $doc.on("keydown", processKeyControls);
+  $infoBtn.on("click", pauseGame);
+  $infoModalCloseBtn.on("click", closeModal);
 };
 
 const resetVars = () => {
@@ -229,10 +307,11 @@ const init = () => {
 };
 
 init();
-gameLoop();
+openModal();
+// gameLoop();
 
-console.log(currPiece, "start", currPiece.x, currPiece.y, currPiece.name);
-console.log(gameBoard);
+// console.log(currPiece, "start", currPiece.x, currPiece.y, currPiece.name);
+// console.log(gameBoard);
 window.gameBoard = gameBoard;
 window.$gameBoard = $gameBoard;
 window.currPiece = currPiece;
