@@ -1,8 +1,5 @@
 import { Board } from "./Board.js";
 import * as Shapes from "./Piece.js";
-// import * as lodash from "../js/lodash.min.js";
-// import _ from "../js/lodash.min.js";
-// const lodash = require("../lodash.min.js");
 
 ///////////////////////////////////////////////////////////////////////
 // DOM Elements
@@ -11,8 +8,8 @@ const $gameContainer = $("#game-container");
 const $gameBoard = $("#game-board");
 const $gameHeader = $("#heading-wrapper");
 const $gameFooter = $("#game-footer");
-const $sidePanel = $("#side-panel");
-const $scorePanel = $("#score-panel");
+// const $sidePanel = $("#side-panel");
+// const $scorePanel = $("#score-panel");
 const $savedPieceBoard = $("#saved-piece-board");
 const $nextPieceBoard = $("#next-piece-board");
 
@@ -31,9 +28,7 @@ const $restartBtn = $("#restart-btn");
 ///////////////////////////////////////////////////////////////////////
 // Constants
 
-const GAME_SPEED = 1;
 const FADE_SPEED = 650;
-const CLOCK_INTERVAL = 800;
 const SHAPES = ["i", "o", "t", "s", "z", "j", "l"];
 
 const LEVEL_CONFIGS = {
@@ -48,17 +43,14 @@ const LEVEL_CONFIGS = {
 
 let loopID;
 let prevTime, elapsedTime;
-let isGameOver, isPaused, score, linesCleared, currentLevel;
+let isGameOver, isPaused;
+let score, linesCleared, currentLevel;
 let gameBoard, nextPieceBoard, savedPieceBoard;
 let currPiece, nextPiece, savedPiece;
-let hadCollision, hasSwapped;
-let currPieceCoords, isLocking;
+let hadCollision, hasSwapped, isLocking;
+
 ///////////////////////////////////////////////////////////////////////
 // Game State
-
-const deepCloneObj = (obj) => {
-  return JSON.parse(JSON.stringify(obj));
-};
 
 const setLevel = (linesCleared) => {
   for (let level of Object.values(LEVEL_CONFIGS)) {
@@ -75,7 +67,7 @@ const updateGameInfo = () => {
 };
 
 const hasCollision = (piece) => {
-  const res = piece.shape.some((row, y) => {
+  hadCollision = piece.shape.some((row, y) => {
     return row.some((val, x) => {
       if (val === 0) return false;
       let realY = y + piece.y;
@@ -86,9 +78,7 @@ const hasCollision = (piece) => {
       return gameBoard.board[realY][realX] !== 0;
     });
   });
-
-  hadCollision = res;
-  return res;
+  return hadCollision;
 };
 
 const rotateClockwise = () => {
@@ -132,7 +122,6 @@ const moveRight = () => {
 };
 
 const moveDown = () => {
-  console.log(`(${currPiece.x},${currPiece.y})`);
   currPiece.y = currPiece.y + 1;
   if (hasCollision(currPiece)) {
     isLocking = true;
@@ -174,7 +163,7 @@ const gameLoop = () => {
   if (!hadCollision) {
     draw();
   } else {
-    console.log("This happens");
+    //can draw
   }
   if (!isGameOver) {
     loopID = requestAnimationFrame(gameLoop);
@@ -182,10 +171,8 @@ const gameLoop = () => {
 };
 
 const gameOver = () => {
-  console.log("Game Over");
   isGameOver = true;
   cancelAnimationFrame(loopID);
-  // $gameOverHeader.toggleClass("visually-hidden");
   $gameOverHeader.removeClass("visually-hidden");
 };
 
@@ -203,7 +190,7 @@ const getNewCurrentPiece = () => {
   if (hasCollision(currPiece)) {
     gameOver();
   } else {
-    console.log("No collision on getNewPiece()");
+    // console.log("No collision on getNewPiece()");
   }
 };
 
@@ -219,7 +206,7 @@ const saveOrSwapPiece = () => {
     nextPiece = getRandomPiece();
     hasSwapped = true;
   } else {
-    currPieceCoords = structuredClone({ x: currPiece.x, y: currPiece.y });
+    const currPieceCoords = structuredClone({ x: currPiece.x, y: currPiece.y });
     const currPieceClone = structuredClone(currPiece);
     const savedPieceClone = structuredClone(savedPiece);
 
@@ -228,7 +215,7 @@ const saveOrSwapPiece = () => {
     currPiece.y = currPieceCoords.y;
 
     if (hasCollision(currPiece)) {
-      console.log("Can't swap due to collision");
+      // console.log("Can't swap due to collision");
       currPiece = currPieceClone;
       savedPiece = savedPieceClone;
     } else {
@@ -246,39 +233,25 @@ const processKeyControls = (e) => {
     case 37:
     case "ArrowLeft":
     case "a":
-      console.log("Move Piece Left");
       moveLeft();
       break;
     case 38:
     case "ArrowUp":
     case "w":
-      console.log("Rotate Piece Clockwise");
       rotateClockwise();
       break;
     case 39:
     case "ArrowRight":
     case "d":
-      console.log("Move Piece Right");
       moveRight();
       break;
     case 40:
     case "ArrowDown":
     case "s":
-      console.log("Move Piece Down Manually");
       moveDown();
       score += Math.trunc(currentLevel.scoreMultiplier);
       break;
-    // FIXME: using p and r is weird if it's available while playing
-    // case "p":
-    //   // isPaused = true; //pause game
-    //   pauseGame();
-    //   break;
-    // case "r":
-    //   // isPaused = false; //resume game
-    //   closeModal();
-    //   break;
     case "Shift":
-      console.log("Saving Current Piece");
       if (!hasSwapped && !isLocking) {
         saveOrSwapPiece();
       }
@@ -288,8 +261,6 @@ const processKeyControls = (e) => {
 const pauseGame = () => {
   if (!isPaused && !isGameOver) {
     isPaused = true;
-    console.log("Game is paused");
-    console.log("Displaying Modal");
     hideElement($gameFooter);
     hideElement($gameHeader);
     hideElement($gameContainer);
@@ -317,7 +288,6 @@ const showElement = ($el) => {
 const resumeGame = () => {
   if (!isGameOver) {
     isPaused = false;
-    console.log("Game resumes");
     if (loopID) {
       cancelAnimationFrame(loopID);
     }
@@ -327,7 +297,6 @@ const resumeGame = () => {
 
 const showGame = () => {
   if (!isGameOver) {
-    console.log("Showing Game Board...");
     showElement($gameContainer);
     showElement($gameHeader);
     showElement($gameFooter);
@@ -377,9 +346,6 @@ const resetVars = () => {
   hasSwapped = false;
   isLocking = false;
 
-  // $gameOverHeader = $("<header id='game-over-header'>Game Over!</header>");
-  // $gameBoard.prepend($gameOverHeader);
-  // $gameOverHeader.hide();
   $gameOverHeader.addClass("visually-hidden");
 
   score = 0;
@@ -389,7 +355,6 @@ const resetVars = () => {
 
   nextPiece = getRandomPiece();
   getNewCurrentPiece();
-  currPieceCoords = structuredClone({ x: currPiece.x, y: currPiece.y });
   savedPiece = null;
 
   prevTime = new Date();
@@ -403,10 +368,3 @@ const init = () => {
 
 init();
 openModal();
-// gameLoop();
-
-// console.log(currPiece, "start", currPiece.x, currPiece.y, currPiece.name);
-// console.log(gameBoard);
-window.gameBoard = gameBoard;
-window.$gameBoard = $gameBoard;
-window.currPiece = currPiece;
