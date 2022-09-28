@@ -253,9 +253,8 @@ const gameLoop = () => {
   }
   if (!hadCollision) {
     draw();
-  } else {
-    //can draw
   }
+
   if (!isGameOver) {
     loopID = requestAnimationFrame(gameLoop);
   }
@@ -286,8 +285,6 @@ const getNewCurrentPiece = () => {
 
   if (hasCollision(currPiece)) {
     gameOver();
-  } else {
-    // console.log("No collision on getNewPiece()");
   }
 };
 
