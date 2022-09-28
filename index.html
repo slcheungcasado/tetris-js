@@ -15,6 +15,21 @@
     <title>Tetris</title>
   </head>
   <body>
+    <audio id="fail-sfx" src="./assets/audio/fail-sfx.mp3"></audio>
+    <audio id="game-over-sfx" src="./assets/audio/game-over-sfx.mp3"></audio>
+    <audio id="info-bgm" src="./assets/audio/info-bgm.mp3"></audio>
+    <audio id="line-clear-sfx" src="./assets/audio/line-clear-sfx.mp3"></audio>
+    <audio id="piece-drop-sfx" src="./assets/audio/piece-drop-sfx.mp3"></audio>
+    <audio id="piece-lock-sfx" src="./assets/audio/piece-lock-sfx.mp3"></audio>
+    <audio
+      id="piece-rotate-sfx"
+      src="./assets/audio/piece-rotate-sfx.mp3"
+    ></audio>
+    <audio id="piece-swap-sfx" src="./assets/audio/piece-swap-sfx.mp3"></audio>
+    <audio id="tetris-bgm" src="./assets/audio/tetris-bgm.mp3"></audio>
+    <audio id="level-up-sfx" src="./assets/audio/level-up-sfx.mp3"></audio>
+    <audio id="line-clear-sfx" src="./assets/audio/line-clear-sfx.mp3"></audio>
+
     <div id="heading-wrapper" class="visually-hidden">
       <header>
         <h1>Tetris</h1>
@@ -59,7 +74,6 @@
           </div>
           <div class="side-panel-section">
             <button id="info-btn">
-              <!-- <img src="./assets/info-i.svg" alt="" /> -->
               <svg x="0px" y="0px" viewBox="0 0 1000 1000">
                 <g>
                   <path
@@ -69,7 +83,6 @@
               </svg>
             </button>
             <button id="restart-btn">
-              <!-- <img src="./assets/arrow-circle.svg" alt="restart" /> -->
               <svg x="0px" y="0px" viewBox="0 0 1000 1000">
                 <g>
                   <path
@@ -95,7 +108,10 @@
               <h2 class="fw-bold mb-0">
                 Welcome to Tetris
                 <div class="modal-icon-wrapper">
-                  <img src="assets/tetris-big.svg" alt="tetris-icon" />
+                  <img
+                    src="assets/imgs/svgs/tetris-big.svg"
+                    alt="tetris-icon"
+                  />
                 </div>
               </h2>
             </div>
@@ -124,9 +140,9 @@
                   rotates them.
                 </p>
                 <div class="modal-icon-wrapper">
-                  <img src="assets/arrows.svg" alt="arrows-icon" />
+                  <img src="assets/imgs/svgs/arrows.svg" alt="arrows-icon" />
                   or
-                  <img src="assets/wasd.svg" alt="arrows-icon" />
+                  <img src="assets/imgs/svgs/wasd.svg" alt="arrows-icon" />
                 </div>
               </dd>
 
@@ -134,7 +150,7 @@
               <dd class="col-sm-9">
                 <p>Press shift to save or swap the current piece in play.</p>
                 <div class="modal-icon-wrapper">
-                  <img src="assets/shift.svg" alt="arrows-icon" />
+                  <img src="assets/imgs/svgs/shift.svg" alt="arrows-icon" />
                 </div>
               </dd>
             </dl>

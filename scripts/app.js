@@ -1,29 +1,41 @@
 import { Board } from "./Board.js";
 import * as Shapes from "./Piece.js";
+import { Audio } from "./Audio.js";
 
 ///////////////////////////////////////////////////////////////////////
-// DOM Elements
+// Visual Elements
 const $doc = $(document);
-const $gameContainer = $("#game-container");
-const $gameBoard = $("#game-board");
+
 const $gameHeader = $("#heading-wrapper");
-const $gameFooter = $("#game-footer");
-// const $sidePanel = $("#side-panel");
-// const $scorePanel = $("#score-panel");
-const $savedPieceBoard = $("#saved-piece-board");
-const $nextPieceBoard = $("#next-piece-board");
+
+const $gameContainer = $("#game-container");
+const $gameOverHeader = $("#game-over-header");
+const $gameBoard = $("#game-board");
 
 const $gameLevelSpan = $("#game-level");
 const $linesClearedSpan = $("#lines-cleared");
 const $playedScoreSpan = $("#player-score");
 
+const $nextPieceBoard = $("#next-piece-board");
+const $savedPieceBoard = $("#saved-piece-board");
+
 const $infoBtn = $("#info-btn");
 const $infoModal = $("#info-modal-div");
 const $infoModalCloseBtn = $("#info-modal-close-button");
 
-const $gameOverHeader = $("#game-over-header");
-
 const $restartBtn = $("#restart-btn");
+
+const $gameFooter = $("#game-footer");
+
+// Audio
+const bgmAudio = new Audio("#tetris-bgm", { volume: 0.3 });
+const pieceRotateSfx = new Audio("#piece-rotate-sfx", { volume: 0.3 });
+const pieceSwapSfx = new Audio("#piece-swap-sfx", { volume: 0.3 });
+const failSfx = new Audio("#fail-sfx", { volume: 0.3 });
+const pieceLockSfx = new Audio("#piece-lock-sfx", { volume: 1 });
+const gameOverSfx = new Audio("#game-over-sfx", { volume: 0.3 });
+const lineClearSfx = new Audio("#line-clear-sfx", { volume: 0.3 });
+const levelUpSfx = new Audio("#level-up-sfx", { volume: 0.5 });
 
 ///////////////////////////////////////////////////////////////////////
 // Constants
@@ -32,22 +44,83 @@ const FADE_SPEED = 650;
 const SHAPES = ["i", "o", "t", "s", "z", "j", "l"];
 
 const LEVEL_CONFIGS = {
-  0: { val: 0, speed: 800, linesClearedThreshold: 0, scoreMultiplier: 1 },
-  1: { val: 1, speed: 700, linesClearedThreshold: 5, scoreMultiplier: 1.5 },
-  2: { val: 2, speed: 600, linesClearedThreshold: 10, scoreMultiplier: 2 },
-  3: { val: 3, speed: 500, linesClearedThreshold: 15, scoreMultiplier: 2.5 },
-  4: { val: 4, speed: 400, linesClearedThreshold: 20, scoreMultiplier: 3 },
-  5: { val: 5, speed: 300, linesClearedThreshold: 25, scoreMultiplier: 4 },
-  6: { val: "MAX", speed: 200, linesClearedThreshold: 30, scoreMultiplier: 5 },
+  0: {
+    val: 0,
+    speed: 800,
+    linesClearedThreshold: 0,
+    scoreMultiplier: 1,
+    bgmSpeed: 1,
+  },
+  1: {
+    val: 1,
+    speed: 700,
+    linesClearedThreshold: 5,
+    scoreMultiplier: 1.5,
+    bgmSpeed: 1.2,
+  },
+  2: {
+    val: 2,
+    speed: 600,
+    linesClearedThreshold: 10,
+    scoreMultiplier: 2,
+    bgmSpeed: 1.4,
+  },
+  3: {
+    val: 3,
+    speed: 500,
+    linesClearedThreshold: 15,
+    scoreMultiplier: 2.5,
+    bgmSpeed: 1.6,
+  },
+  4: {
+    val: 4,
+    speed: 400,
+    linesClearedThreshold: 20,
+    scoreMultiplier: 3,
+    bgmSpeed: 1.8,
+  },
+  5: {
+    val: 5,
+    speed: 300,
+    linesClearedThreshold: 25,
+    scoreMultiplier: 4,
+    bgmSpeed: 2,
+  },
+  6: {
+    val: 6,
+    speed: 200,
+    linesClearedThreshold: 30,
+    scoreMultiplier: 5,
+    bgmSpeed: 2.2,
+  },
+  7: {
+    val: "MAX",
+    speed: 100,
+    linesClearedThreshold: 35,
+    scoreMultiplier: 5,
+    bgmSpeed: 2.5,
+  },
 };
+
+const ALL_AUDIO = [
+  bgmAudio,
+  pieceRotateSfx,
+  pieceSwapSfx,
+  failSfx,
+  pieceLockSfx,
+  levelUpSfx,
+  lineClearSfx,
+  gameOverSfx,
+];
 
 let loopID;
 let prevTime, elapsedTime;
-let isGameOver, isPaused;
-let score, linesCleared, currentLevel;
+let isGameOver;
+let score, linesCleared, prevLevelVal, currentLevel;
 let gameBoard, nextPieceBoard, savedPieceBoard;
 let currPiece, nextPiece, savedPiece;
 let hadCollision, hasSwapped, isLocking;
+let isPaused = true;
 
 ///////////////////////////////////////////////////////////////////////
 // Game State
@@ -57,6 +130,16 @@ const setLevel = (linesCleared) => {
     if (linesCleared >= level.linesClearedThreshold) {
       currentLevel = level;
     }
+  }
+
+  bgmAudio.setPlaySpeed(currentLevel.bgmSpeed);
+  if (
+    toString.call(currentLevel.val) != "String" &&
+    prevLevelVal < currentLevel.val &&
+    currentLevel.val > 0
+  ) {
+    prevLevelVal = currentLevel.val;
+    levelUpSfx.play();
   }
 };
 
@@ -104,6 +187,9 @@ const rotateClockwise = () => {
   }
   if (hasCollision(currPiece)) {
     currPiece.shape = shapeCopy;
+    failSfx.play();
+  } else {
+    pieceRotateSfx.playIfIntervalAtLeast(0.05);
   }
 };
 
@@ -128,10 +214,15 @@ const moveDown = () => {
     currPiece.y = currPiece.y - 1;
     gameBoard.lockPiece(currPiece);
     getNewCurrentPiece();
+    let prevLines = linesCleared;
     linesCleared += gameBoard.clearLines();
+    if (linesCleared > prevLines) {
+      lineClearSfx.play();
+    }
     setLevel(linesCleared);
     score += Math.trunc(linesCleared * currentLevel.scoreMultiplier);
     hasSwapped = false;
+    pieceLockSfx.play();
   }
   isLocking = false;
 };
@@ -170,9 +261,15 @@ const gameLoop = () => {
   }
 };
 
+const stopAllAudio = () => {
+  ALL_AUDIO.forEach((audio) => audio.pause());
+};
+
 const gameOver = () => {
   isGameOver = true;
   cancelAnimationFrame(loopID);
+  stopAllAudio();
+  gameOverSfx.play();
   $gameOverHeader.removeClass("visually-hidden");
 };
 
@@ -205,6 +302,7 @@ const saveOrSwapPiece = () => {
 
     nextPiece = getRandomPiece();
     hasSwapped = true;
+    pieceSwapSfx.play();
   } else {
     const currPieceCoords = structuredClone({ x: currPiece.x, y: currPiece.y });
     const currPieceClone = structuredClone(currPiece);
@@ -215,19 +313,22 @@ const saveOrSwapPiece = () => {
     currPiece.y = currPieceCoords.y;
 
     if (hasCollision(currPiece)) {
-      // console.log("Can't swap due to collision");
       currPiece = currPieceClone;
       savedPiece = savedPieceClone;
+      failSfx.play();
     } else {
       currPieceClone.x = 0;
       currPieceClone.y = 0;
       savedPiece = currPieceClone;
       hasSwapped = true;
+      pieceSwapSfx.play();
     }
   }
 };
 
 const processKeyControls = (e) => {
+  if (isGameOver || isPaused || isLocking) return;
+
   const key = e.key;
   switch (key) {
     case 37:
@@ -252,7 +353,7 @@ const processKeyControls = (e) => {
       score += Math.trunc(currentLevel.scoreMultiplier);
       break;
     case "Shift":
-      if (!hasSwapped && !isLocking) {
+      if (!hasSwapped) {
         saveOrSwapPiece();
       }
   }
@@ -260,6 +361,7 @@ const processKeyControls = (e) => {
 
 const pauseGame = () => {
   if (!isPaused && !isGameOver) {
+    bgmAudio.pause();
     isPaused = true;
     hideElement($gameFooter);
     hideElement($gameHeader);
@@ -292,6 +394,7 @@ const resumeGame = () => {
       cancelAnimationFrame(loopID);
     }
     gameLoop();
+    bgmAudio.play(false);
   }
 };
 
@@ -325,7 +428,17 @@ const resetGame = () => {
     cancelAnimationFrame(loopID);
   }
   resetVars();
+  bgmAudio.restart();
+  bgmAudio.play();
   gameLoop();
+};
+
+const loopBGM = () => {
+  if (!isGameOver) {
+    console.log("looping BGM...");
+    bgmAudio.setPlaySpeed(currentLevel.bgmSpeed);
+    bgmAudio.play();
+  }
 };
 
 const bindEvents = () => {
@@ -333,6 +446,7 @@ const bindEvents = () => {
   $infoBtn.on("click", pauseGame);
   $infoModalCloseBtn.on("click", closeModal);
   $restartBtn.on("click", resetGame);
+  bgmAudio.$audioEl.on("ended", loopBGM);
 };
 
 const resetVars = () => {
@@ -350,6 +464,7 @@ const resetVars = () => {
 
   score = 0;
   linesCleared = 0;
+  prevLevelVal = -1;
   setLevel(linesCleared);
   updateGameInfo();
 
