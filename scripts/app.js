@@ -210,9 +210,11 @@ const moveRight = () => {
 const moveDown = () => {
   currPiece.y = currPiece.y + 1;
   if (hasCollision(currPiece)) {
-    isLocking = true;
     currPiece.y = currPiece.y - 1;
+
+    isLocking = true;
     gameBoard.lockPiece(currPiece);
+
     getNewCurrentPiece();
     let prevLines = linesCleared;
     linesCleared += gameBoard.clearLines();
@@ -232,9 +234,11 @@ const draw = () => {
     gameBoard.refresh();
     nextPieceBoard.refresh();
     savedPieceBoard.refresh();
+
     gameBoard.drawPiece(currPiece);
     nextPieceBoard.drawPiece(nextPiece);
     savedPieceBoard.drawPiece(savedPiece);
+
     updateGameInfo();
   }
 };
@@ -430,9 +434,9 @@ const resetGame = () => {
   gameLoop();
 };
 
-const loopBGM = () => {
+const loopBgm = () => {
   if (!isGameOver) {
-    console.log("looping BGM...");
+    // console.log("looping BGM...");
     bgmAudio.setPlaySpeed(currentLevel.bgmSpeed);
     bgmAudio.play();
   }
@@ -443,7 +447,7 @@ const bindEvents = () => {
   $infoBtn.on("click", pauseGame);
   $infoModalCloseBtn.on("click", closeModal);
   $restartBtn.on("click", resetGame);
-  bgmAudio.$audioEl.on("ended", loopBGM);
+  bgmAudio.$audioEl.on("ended", loopBgm);
 };
 
 const resetVars = () => {

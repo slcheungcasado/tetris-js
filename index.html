@@ -29,145 +29,165 @@
     <audio id="tetris-bgm" src="./assets/audio/tetris-bgm.mp3"></audio>
     <audio id="level-up-sfx" src="./assets/audio/level-up-sfx.mp3"></audio>
     <audio id="line-clear-sfx" src="./assets/audio/line-clear-sfx.mp3"></audio>
-
-    <div id="heading-wrapper" class="visually-hidden">
-      <header>
+    <div
+      id="body-wrapper"
+      class="d-flex flex-column justify-content-between align-items-stretch p-0"
+    >
+      <header
+        id="heading-wrapper"
+        class="visually-hidden py-3 bg-dark text-light"
+      >
         <h1>Tetris</h1>
       </header>
-    </div>
-    <div id="game-container" class="container visually-hidden">
-      <div class="row">
-        <div id="game-board" class="col-10">
-          <header id="game-over-header">Game Over!</header>
-        </div>
-        <div id="side-panel" class="col-2">
-          <div class="side-panel-section">
-            <h6 class="side-panel-section-heading">Game Info</h6>
-            <div class="row side-panel-section-info">
-              <span id="game-level"
-                >Level<br />
-                0</span
-              >
-              <span id="lines-cleared"
-                >Lines Cleared<br />
-                0</span
-              >
-              <span id="player-score"
-                >Score<br />
-                0</span
-              >
+      <main>
+        <div id="game-container" class="container visually-hidden">
+          <div class="row">
+            <div id="game-board" class="col-10">
+              <header id="game-over-header">Game Over!</header>
             </div>
-          </div>
-          <div class="side-panel-section">
-            <h6 class="side-panel-section-heading">Next Piece</h6>
-            <div
-              id="next-piece-board"
-              class="row side-panel-section-subgrid"
-            ></div>
-          </div>
-          <div class="side-panel-section">
-            <h6 class="side-panel-section-heading">Saved Piece</h6>
-            <div
-              id="saved-piece-board"
-              class="row side-panel-section-subgrid"
-            ></div>
-          </div>
-          <div class="side-panel-section">
-            <button id="info-btn">
-              <svg x="0px" y="0px" viewBox="0 0 1000 1000">
-                <g>
-                  <path
-                    d="M493.4,10.1C222.9,13.7,6.4,236,10,506.6C13.6,777,236,993.5,506.6,989.9c270.6-3.6,487-226,483.4-496.5C986.4,222.9,764,6.5,493.4,10.1z M547.8,173.4c49.8,0,64.5,28.9,64.5,61.9c0,41.3-33.1,79.5-89.5,79.5c-47.2,0-69.6-23.8-68.3-63C454.5,218.7,482.2,173.4,547.8,173.4z M420,806.2c-34,0-59-20.6-35.2-111.5l39-161c6.8-25.8,7.9-36.2,0-36.2c-10.2,0-54.4,17.8-80.6,35.4l-17-27.8c82.8-69.1,178-109.7,218.8-109.7c34,0,39.7,40.3,22.7,102.2L523.1,667c-7.9,30-4.5,40.3,3.4,40.3c10.2,0,43.7-12.4,76.6-38.2l19.2,25.8C541.8,775.4,454,806.3,420,806.2L420,806.2z"
-                  />
-                </g>
-              </svg>
-            </button>
-            <button id="restart-btn">
-              <svg x="0px" y="0px" viewBox="0 0 1000 1000">
-                <g>
-                  <path
-                    d="M916.8,573.2C916.8,803,729.8,990,500,990C270.2,990,83.2,803,83.2,573.2c0-76,20.7-150.4,59.7-215.1l108.7,65.6c-27.1,44.9-41.5,96.6-41.5,149.5C210.2,733,340.2,863,500,863c159.8,0,289.8-130,289.8-289.7c0-154-120.8-279.9-272.6-288.9H455l52.3,132.5c1.8,4.4,0.3,9.5-3.5,12.4c-3.8,2.9-9.1,2.9-12.9-0.1L230.8,229.1c-2.6-2-4.1-5.1-4.1-8.4c0-3.3,1.5-6.4,4.1-8.4L491,12.2c1.9-1.5,4.2-2.2,6.5-2.2c2.3,0,4.5,0.7,6.4,2.1c3.8,2.9,5.2,7.9,3.5,12.4L455,157l45-0.5c16.1,0,69.5,5.4,78.3,7.5C770.8,200.7,916.8,370.2,916.8,573.2z"
-                  />
-                </g>
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div
-      class="modal modal-tour position-static visually-hidden bg-secondary"
-      tabindex="-1"
-      role="dialog"
-      id="info-modal-div"
-    >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content rounded-4 shadow">
-          <div class="modal-body p-5">
-            <div class="modal-heading-wrapper">
-              <h2 class="fw-bold mb-0">
-                Welcome to Tetris
-                <div class="modal-icon-wrapper">
-                  <img
-                    src="assets/imgs/svgs/tetris-big.svg"
-                    alt="tetris-icon"
-                  />
+            <div id="side-panel" class="col-2">
+              <div class="side-panel-section">
+                <h6 class="side-panel-section-heading">Game Info</h6>
+                <div class="row side-panel-section-info">
+                  <span id="game-level"
+                    >Level<br />
+                    0</span
+                  >
+                  <span id="lines-cleared"
+                    >Lines Cleared<br />
+                    0</span
+                  >
+                  <span id="player-score"
+                    >Score<br />
+                    0</span
+                  >
                 </div>
-              </h2>
+              </div>
+              <div class="side-panel-section">
+                <h6 class="side-panel-section-heading">Next Piece</h6>
+                <div
+                  id="next-piece-board"
+                  class="row side-panel-section-subgrid"
+                ></div>
+              </div>
+              <div class="side-panel-section">
+                <h6 class="side-panel-section-heading">Saved Piece</h6>
+                <div
+                  id="saved-piece-board"
+                  class="row side-panel-section-subgrid"
+                ></div>
+              </div>
+              <div class="side-panel-section">
+                <button id="info-btn">
+                  <svg x="0px" y="0px" viewBox="0 0 1000 1000">
+                    <g>
+                      <path
+                        d="M493.4,10.1C222.9,13.7,6.4,236,10,506.6C13.6,777,236,993.5,506.6,989.9c270.6-3.6,487-226,483.4-496.5C986.4,222.9,764,6.5,493.4,10.1z M547.8,173.4c49.8,0,64.5,28.9,64.5,61.9c0,41.3-33.1,79.5-89.5,79.5c-47.2,0-69.6-23.8-68.3-63C454.5,218.7,482.2,173.4,547.8,173.4z M420,806.2c-34,0-59-20.6-35.2-111.5l39-161c6.8-25.8,7.9-36.2,0-36.2c-10.2,0-54.4,17.8-80.6,35.4l-17-27.8c82.8-69.1,178-109.7,218.8-109.7c34,0,39.7,40.3,22.7,102.2L523.1,667c-7.9,30-4.5,40.3,3.4,40.3c10.2,0,43.7-12.4,76.6-38.2l19.2,25.8C541.8,775.4,454,806.3,420,806.2L420,806.2z"
+                      />
+                    </g>
+                  </svg>
+                </button>
+                <button id="restart-btn">
+                  <svg x="0px" y="0px" viewBox="0 0 1000 1000">
+                    <g>
+                      <path
+                        d="M916.8,573.2C916.8,803,729.8,990,500,990C270.2,990,83.2,803,83.2,573.2c0-76,20.7-150.4,59.7-215.1l108.7,65.6c-27.1,44.9-41.5,96.6-41.5,149.5C210.2,733,340.2,863,500,863c159.8,0,289.8-130,289.8-289.7c0-154-120.8-279.9-272.6-288.9H455l52.3,132.5c1.8,4.4,0.3,9.5-3.5,12.4c-3.8,2.9-9.1,2.9-12.9-0.1L230.8,229.1c-2.6-2-4.1-5.1-4.1-8.4c0-3.3,1.5-6.4,4.1-8.4L491,12.2c1.9-1.5,4.2-2.2,6.5-2.2c2.3,0,4.5,0.7,6.4,2.1c3.8,2.9,5.2,7.9,3.5,12.4L455,157l45-0.5c16.1,0,69.5,5.4,78.3,7.5C770.8,200.7,916.8,370.2,916.8,573.2z"
+                      />
+                    </g>
+                  </svg>
+                </button>
+              </div>
             </div>
-
-            <dl class="row instructions">
-              <dt class="col-sm-3">Instructions</dt>
-              <dd class="col-sm-9">
-                <ul>
-                  <li>
-                    Form as many rows as you can by moving or rotating the
-                    falling Tetris pieces. <br />
-                    <small class="text-muted"
-                      >The more lines you make at once, the more score you get.
+          </div>
+        </div>
+        <div
+          class="modal modal-tour visually-hidden bg-secondary"
+          tabindex="-1"
+          role="dialog"
+          id="info-modal-div"
+        >
+          <div class="modal-dialog" role="document">
+            <div class="modal-content rounded-4 shadow">
+              <div class="modal-body p-5">
+                <div class="modal-heading-wrapper">
+                  <h2 class="fw-bold mb-0">
+                    Welcome to Tetris
+                    <div class="modal-icon-wrapper">
+                      <img
+                        src="assets/imgs/svgs/tetris-big.svg"
+                        alt="tetris-icon"
+                      />
+                    </div>
+                  </h2>
+                </div>
+                <dl class="row instructions">
+                  <dt class="col-sm-3">Instructions</dt>
+                  <dd class="col-sm-9">
+                    <ul>
+                      <li>
+                        Form as many rows as you can by moving or rotating the
+                        falling Tetris pieces. <br />
+                        <small class="text-muted"
+                          >The more lines you make at once, the more score you
+                          get.
+                        </small>
+                      </li>
+                      <li>
+                        The game ends when you can no longer place another
+                        piece.
+                      </li>
+                    </ul>
+                  </dd>
+                  <dt class="col-sm-3">Movement & Rotation</dt>
+                  <dd class="col-sm-9">
+                    <p>
+                      Press arrow left, right, or down to move the pieces. Arrow
+                      up rotates them.
+                    </p>
+                    <div class="modal-icon-wrapper">
+                      <img
+                        src="assets/imgs/svgs/arrows.svg"
+                        alt="arrows-icon"
+                      />
+                      or
+                      <img src="assets/imgs/svgs/wasd.svg" alt="arrows-icon" />
+                    </div>
+                  </dd>
+                  <dt class="col-sm-3">Save Piece</dt>
+                  <dd class="col-sm-9">
+                    <p>
+                      Press shift to save or swap the current piece in play.
+                    </p>
+                    <small class="text-muted">
+                      You can do this <strong>once</strong> every time you get a
+                      new piece.
                     </small>
-                  </li>
-                  <li>
-                    The game ends when you can no longer place another piece.
-                  </li>
-                </ul>
-              </dd>
-
-              <dt class="col-sm-3">Movement & Rotation</dt>
-              <dd class="col-sm-9">
-                <p>
-                  Press arrow left, right, or down to move the pieces. Arrow up
-                  rotates them.
-                </p>
-                <div class="modal-icon-wrapper">
-                  <img src="assets/imgs/svgs/arrows.svg" alt="arrows-icon" />
-                  or
-                  <img src="assets/imgs/svgs/wasd.svg" alt="arrows-icon" />
-                </div>
-              </dd>
-
-              <dt class="col-sm-3">Save Piece</dt>
-              <dd class="col-sm-9">
-                <p>Press shift to save or swap the current piece in play.</p>
-                <div class="modal-icon-wrapper">
-                  <img src="assets/imgs/svgs/shift.svg" alt="arrows-icon" />
-                </div>
-              </dd>
-            </dl>
-            <button
-              type="button"
-              class="btn btn-lg btn-primary mt-5 w-100"
-              data-bs-dismiss="modal"
-              id="info-modal-close-button"
-            >
-              Got it, thanks!
-            </button>
+                    <div class="modal-icon-wrapper">
+                      <img src="assets/imgs/svgs/shift.svg" alt="arrows-icon" />
+                    </div>
+                  </dd>
+                </dl>
+                <button
+                  type="button"
+                  class="btn btn-lg btn-primary mt-5 w-100"
+                  data-bs-dismiss="modal"
+                  id="info-modal-close-button"
+                >
+                  Got it, thanks!
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-    <div id="game-footer" class="visually-hidden">
-      <footer>Recreated by Jeremy Cheung</footer>
+      </main>
+      <footer
+        id="game-footer"
+        class="visually-hidden footer mt-auto py-3 bg-dark text-light"
+      >
+        <div class="container">
+          <span>Recreated by Jeremy Cheung</span>
+        </div>
+      </footer>
     </div>
   </body>
 </html>
