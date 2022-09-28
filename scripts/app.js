@@ -436,7 +436,6 @@ const resetGame = () => {
 
 const loopBgm = () => {
   if (!isGameOver) {
-    // console.log("looping BGM...");
     bgmAudio.setPlaySpeed(currentLevel.bgmSpeed);
     bgmAudio.play();
   }
