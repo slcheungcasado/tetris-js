@@ -18,3 +18,4 @@ Favicons:
 - [manshagraphics](https://www.flaticon.com/authors/manshagraphics)
 - [deemakdaksina](https://www.flaticon.com/authors/deemakdaksina)
 - [freepik](https://www.flaticon.com/authors/freepik)
+- [icons8](icons8.com)

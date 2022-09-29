@@ -13,8 +13,8 @@ export class Board {
     this.width = $parentContainer.width();
     this.numRows = numRows;
     this.numCols = numCols;
-    this.board = new Array(numCols);
-    this.boardElements = new Array(numCols);
+    this.board = new Array(numCols); // stores numbers
+    this.boardElements = new Array(numCols); // stores HTML div element
     this.init();
   }
 

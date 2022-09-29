@@ -102,6 +102,8 @@ const LEVEL_CONFIGS = {
   },
 };
 
+const SIDE_BOARD_SIZE = 4;
+
 const ALL_AUDIO = [
   bgmAudio,
   pieceRotateSfx,
@@ -169,20 +171,20 @@ const rotateClockwise = () => {
   const n = currPiece.shape.length;
   const numLayers = Math.trunc(n / 2);
   for (let layer = 0; layer < numLayers; layer++) {
-    let first = layer,
-      last = n - first - 1;
-    for (let val = first; val < last; val++) {
-      let offset = val - first;
+    let start = layer;
+    let end = n - start - 1;
+    for (let i = start; i < end; i++) {
+      let offset = i - start;
 
-      let top = currPiece.shape[first][val];
-      let right = currPiece.shape[val][last];
-      let bottom = currPiece.shape[last][last - offset];
-      let left = currPiece.shape[last - offset][first];
+      let top = currPiece.shape[start][i];
+      let right = currPiece.shape[i][end];
+      let bottom = currPiece.shape[end][end - offset];
+      let left = currPiece.shape[end - offset][start];
 
-      currPiece.shape[first][val] = left;
-      currPiece.shape[val][last] = top;
-      currPiece.shape[last][last - offset] = right;
-      currPiece.shape[last - offset][first] = bottom;
+      currPiece.shape[start][i] = left;
+      currPiece.shape[i][end] = top;
+      currPiece.shape[end][end - offset] = right;
+      currPiece.shape[end - offset][start] = bottom;
     }
   }
   if (hasCollision(currPiece)) {
@@ -332,22 +334,18 @@ const processKeyControls = (e) => {
 
   const key = e.key;
   switch (key) {
-    case 37:
     case "ArrowLeft":
     case "a":
       moveLeft();
       break;
-    case 38:
     case "ArrowUp":
     case "w":
       rotateClockwise();
       break;
-    case 39:
     case "ArrowRight":
     case "d":
       moveRight();
       break;
-    case 40:
     case "ArrowDown":
     case "s":
       moveDown();
@@ -451,9 +449,14 @@ const bindEvents = () => {
 
 const resetVars = () => {
   loopID = null;
+
   gameBoard = new Board($gameBoard);
-  nextPieceBoard = new Board($nextPieceBoard, 4, 4);
-  savedPieceBoard = new Board($savedPieceBoard, 4, 4);
+  nextPieceBoard = new Board($nextPieceBoard, SIDE_BOARD_SIZE, SIDE_BOARD_SIZE);
+  savedPieceBoard = new Board(
+    $savedPieceBoard,
+    SIDE_BOARD_SIZE,
+    SIDE_BOARD_SIZE
+  );
 
   isGameOver = false;
   hadCollision = false;
