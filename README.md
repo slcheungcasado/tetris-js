@@ -9,3 +9,12 @@ A remake of the classic arcade game Tetris using JavaScript.
 
 - Playing with sound is recommended.
 - The game progressively gets faster as you clear more lines.
+
+### Credits
+
+Favicons:
+
+- [smashicons](https://www.flaticon.com/authors/smashicons)
+- [manshagraphics](https://www.flaticon.com/authors/manshagraphics)
+- [deemakdaksina](https://www.flaticon.com/authors/deemakdaksina)
+- [freepik](https://www.flaticon.com/authors/freepik)
