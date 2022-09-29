@@ -22,4 +22,4 @@ task("deploy", function () {
   return src("./dist/**/*").pipe(deploy());
 });
 
-exports.default = series(minifyJS, watchTask);
+exports.default = series(minifyJS, watchTask, deploy);
