@@ -10,6 +10,8 @@ A remake of the classic arcade game Tetris using JavaScript.
 - Playing with sound is recommended.
 - The game progressively gets faster as you clear more lines.
 
+Demo: http://slcheungcasado.github.io/tetris-js
+
 ### Credits
 
 Favicons:
