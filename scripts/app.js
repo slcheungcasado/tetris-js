@@ -330,6 +330,7 @@ const saveOrSwapPiece = () => {
 };
 
 const processKeyControls = (e) => {
+  e.preventDefault();
   if (isGameOver || isPaused || isLocking) return;
 
   const key = e.key;
